@@ -1,0 +1,73 @@
+    <!-- Recommendation Engine Section -->
+    <section class="recommendation-section" id="recommendation">
+        <div class="recommendation-container">
+            <h2 class="recommendation-title">🎯 Hangi Strateji Size Uygun mu? <span class="recommendation-subtitle">Yapay Zeka ile Hesaplayın</span></h2>
+            
+            <div class="recommendation-form-wrapper">
+                <div class="recommendation-form">
+                    <div class="form-group">
+                        <label class="form-label">🏢 Sektörünüz</label>
+                        <select class="form-select" id="recSector">
+                            <option value="">-- Seçiniz --</option>
+                            <option value="egitim">🎓 Eğitim</option>
+                            <option value="teknoloji">💻 Teknoloji</option>
+                            <option value="gida">🍔 Gıda</option>
+                            <option value="perakende">🛍️ Perakende</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">👥 Hedef Kitleniz</label>
+                        <select class="form-select" id="recAudience">
+                            <option value="">-- Seçiniz --</option>
+                            <option value="ogrenciler">👨‍🎓 Öğrenciler</option>
+                            <option value="beyaz-yaka">💼 Beyaz Yaka</option>
+                            <option value="genel">🌍 Genel Halk</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">💰 Bütçe Aralığı</label>
+                        <select class="form-select" id="recBudget">
+                            <option value="">-- Seçiniz --</option>
+                            <option value="dusuk">💚 Düşük (5K-15K TL)</option>
+                            <option value="orta">🟡 Orta (15K-50K TL)</option>
+                            <option value="yuksek">❤️ Yüksek (50K+ TL)</option>
+                        </select>
+                    </div>
+
+                    <button class="recommendation-button" onclick="analyzeStrategy()">⚡ Analiz Et ve Öner</button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="recommendation-loading" id="recLoading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">📊 Veriler İşleniyor...</div>
+            </div>
+
+            <!-- Result Card -->
+            <div class="recommendation-result" id="recResult" style="display: none;">
+                <div class="result-badge">✨ ÖNERİLEN STRATEJİ</div>
+                <div class="result-package" id="resultPackage">Kampüs Dominasyonu</div>
+                <p class="result-reason" id="resultReason">Verilerimize göre öğrenciler günde ortalama 4 saat kampüs içinde bulunuyor. Markanız ders aralarında en yüksek etkileşimi alacak.</p>
+                
+                <div class="result-metrics">
+                    <div class="metric-item">
+                        <div class="metric-label">Uyum Oranı</div>
+                        <div class="metric-value" id="resultScore">95%</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Beklenen ROI</div>
+                        <div class="metric-value" id="resultROI">Yüksek</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Tahmini Süre</div>
+                        <div class="metric-value" id="resultDuration">4 Hafta</div>
+                    </div>
+                </div>
+
+                <button class="result-button" onclick="scrollToPricing()">🚀 Hemen Bu Paketi Seç</button>
+            </div>
+        </div>
+    </section>

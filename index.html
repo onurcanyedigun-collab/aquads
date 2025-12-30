@@ -1,0 +1,3722 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaDS - Su Yönetimi Çözümleri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #4A90E2;
+            --light-blue: #E3F2FD;
+            --dark-blue: #2C5F8D;
+            --accent-blue: #64B5F6;
+            --text-dark: #1A1A2E;
+            --text-light: #6B7280;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 50%, #90CAF9 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: '💧';
+            font-size: 1.5rem;
+            -webkit-text-fill-color: initial;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-blue));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 0.5rem;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .cta-nav-button {
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white !important;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .cta-nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+        }
+
+        .cta-nav-button::after {
+            display: none;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary-blue);
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            object-fit: cover;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(30, 58, 138, 0.6) 50%, rgba(0, 0, 0, 0.5) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(100, 181, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(74, 144, 226, 0.15) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-weight: 800;
+            line-height: 1.2;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, #60a5fa, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 1s ease 0.2s backwards;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s backwards;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: white;
+            color: var(--primary-blue);
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .cta-button-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .cta-button-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin-top: 4rem;
+            animation: fadeInUp 1s ease 0.6s backwards;
+        }
+
+        .hero-stat-item {
+            text-align: center;
+        }
+
+        .hero-stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-stat-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-20px) scale(1.05);
+            }
+        }
+
+        /* Clients/Logos Section */
+        .clients {
+            background: linear-gradient(180deg, #E3F2FD 0%, #ffffff 100%);
+            padding: 4rem 0;
+            border-bottom: 1px solid rgba(100, 181, 246, 0.2);
+        }
+
+        .clients-title {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 3rem;
+        }
+
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .client-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            transition: transform 0.3s, opacity 0.3s, filter 0.3s;
+            opacity: 0.85;
+        }
+
+        .client-logo:hover {
+            transform: scale(1.15);
+            opacity: 1;
+        }
+
+        .client-logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4A90E2, #64B5F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Segoe UI', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .client-logo-text.tech {
+            font-style: italic;
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .client-logo-text.modern {
+            font-weight: 300;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #1976D2, #4FC3F7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Timeline Section */
+        .timeline-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #cffafe 100%);
+        }
+
+        .timeline-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .timeline-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 4rem;
+        }
+
+        .timeline-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .timeline-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            position: relative;
+        }
+
+        .timeline-steps::before {
+            content: '';
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.3), transparent);
+            z-index: 0;
+        }
+
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-step:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-step:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-step:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-step:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-step:nth-child(5) { animation-delay: 0.5s; }
+
+        .timeline-icon-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3);
+            border: 4px solid white;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-step:hover .timeline-icon {
+            transform: scale(1.2) rotateZ(10deg);
+            box-shadow: 0 12px 40px rgba(74, 144, 226, 0.5);
+        }
+
+        .timeline-step.active .timeline-icon {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 12px 40px rgba(79, 172, 254, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-content {
+            padding: 1.5rem 1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid var(--primary-blue);
+            transition: all 0.3s ease;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .timeline-step:hover .timeline-content {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+            border-top-color: #4facfe;
+        }
+
+        .timeline-step.active .timeline-content {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-top-color: #4facfe;
+        }
+
+        .timeline-content h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Timeline Responsive */
+        @media (max-width: 768px) {
+            .timeline-steps {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .timeline-steps::before {
+                display: none;
+            }
+
+            .timeline-step {
+                margin-bottom: 0;
+            }
+
+            .timeline-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            .timeline-title {
+                font-size: 1.8rem;
+            }
+
+            .timeline-content h3 {
+                font-size: 1.1rem;
+            }
+
+            .timeline-content p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Bento Grid Section */
+        .bento-section {
+            padding: 6rem 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--dark-blue);
+            font-weight: 700;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .bento-card {
+            border-radius: 24px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(74, 144, 226, 0.25);
+        }
+
+        .bento-card-large {
+            grid-row: 1 / 3;
+            background: 
+                linear-gradient(135deg, rgba(30, 58, 138, 0.95) 0%, rgba(37, 99, 235, 0.95) 50%, rgba(59, 130, 246, 0.9) 100%),
+                url('data:image/svg+xml,%3Csvg width="800" height="600" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3ClinearGradient id="skyGrad" x1="0%25" y1="0%25" x2="0%25" y2="100%25"%3E%3Cstop offset="0%25" style="stop-color:%231e40af;stop-opacity:1" /%3E%3Cstop offset="100%25" style="stop-color:%232563eb;stop-opacity:1" /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="800" height="600" fill="url(%23skyGrad)"/%3E%3C!-- City Silhouette --%3E%3Cg opacity="0.15" fill="%23ffffff"%3E%3Crect x="50" y="400" width="60" height="200"/%3E%3Crect x="120" y="350" width="70" height="250"/%3E%3Crect x="200" y="420" width="50" height="180"/%3E%3Crect x="260" y="380" width="80" height="220"/%3E%3Crect x="350" y="360" width="65" height="240"/%3E%3Crect x="425" y="410" width="55" height="190"/%3E%3Crect x="490" y="340" width="75" height="260"/%3E%3Crect x="575" y="390" width="60" height="210"/%3E%3Crect x="645" y="370" width="70" height="230"/%3E%3C/g%3E%3C!-- Water Bottles --%3E%3Cg opacity="0.2" fill="%23ffffff"%3E%3Cellipse cx="150" cy="200" rx="15" ry="45"/%3E%3Crect x="135" y="160" width="30" height="15" rx="3"/%3E%3Cellipse cx="400" cy="150" rx="15" ry="45"/%3E%3Crect x="385" y="110" width="30" height="15" rx="3"/%3E%3Cellipse cx="650" cy="180" rx="15" ry="45"/%3E%3Crect x="635" y="140" width="30" height="15" rx="3"/%3E%3C/g%3E%3C!-- Movement Lines --%3E%3Cg opacity="0.1" stroke="%23ffffff" stroke-width="2" fill="none"%3E%3Cpath d="M 100 250 Q 200 200 300 250" /%3E%3Cpath d="M 300 280 Q 400 230 500 280" /%3E%3Cpath d="M 500 220 Q 600 170 700 220" /%3E%3C/g%3E%3C!-- Dots Pattern --%3E%3Cg opacity="0.08" fill="%23ffffff"%3E%3Ccircle cx="80" cy="100" r="3"/%3E%3Ccircle cx="180" cy="130" r="3"/%3E%3Ccircle cx="280" cy="90" r="3"/%3E%3Ccircle cx="380" cy="120" r="3"/%3E%3Ccircle cx="480" cy="80" r="3"/%3E%3Ccircle cx="580" cy="110" r="3"/%3E%3Ccircle cx="680" cy="100" r="3"/%3E%3Ccircle cx="130" cy="300" r="3"/%3E%3Ccircle cx="330" cy="320" r="3"/%3E%3Ccircle cx="530" cy="310" r="3"/%3E%3Ccircle cx="730" cy="300" r="3"/%3E%3C/g%3E%3C/svg%3E');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .bento-card-large::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: translate(30%, -30%) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translate(30%, -30%) scale(1.1);
+            }
+        }
+
+        .bento-card-small {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+        }
+
+        .bento-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .bento-card-large .bento-icon {
+            font-size: 4rem;
+            opacity: 0.95;
+        }
+
+        .bento-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .bento-card-large .bento-title {
+            font-size: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bento-card-small .bento-title {
+            color: var(--dark-blue);
+        }
+
+        .bento-description {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .bento-card-large .bento-description {
+            max-width: 90%;
+            position: relative;
+            z-index: 1;
+            font-size: 1.2rem;
+        }
+
+        /* Recommendation Engine Section */
+        .recommendation-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #fff5f9 0%, #f0f9ff 50%, #f0fdf4 100%);
+        }
+
+        .recommendation-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .recommendation-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #10B981 0%, #06B6D4 50%, #3B82F6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .recommendation-subtitle {
+            display: block;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #06B6D4, #3B82F6, #10B981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-top: 0.5rem;
+        }
+
+        .recommendation-form-wrapper {
+            margin: 3rem 0 2rem;
+            padding: 2.5rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 253, 244, 0.95));
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
+            border: 2px solid rgba(16, 185, 129, 0.1);
+        }
+
+        .recommendation-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 700;
+            background: linear-gradient(135deg, #10B981, #06B6D4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-select {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #374151;
+        }
+
+        .form-select:hover {
+            border-color: #10B981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #06B6D4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+
+        .recommendation-button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .recommendation-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .recommendation-button:active {
+            transform: translateY(0);
+        }
+
+        /* Loading State */
+        .recommendation-loading {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #10B981;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Result Card */
+        .recommendation-result {
+            margin-top: 2rem;
+            padding: 3rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 244, 0.95));
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.2);
+            border-left: 5px solid;
+            border-image: linear-gradient(135deg, #10B981, #06B6D4) 1;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .result-package {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10B981, #06B6D4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .result-reason {
+            font-size: 1.05rem;
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .result-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(6, 182, 212, 0.05));
+            border-radius: 12px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10B981 0%, #06B6D4 50%, #3B82F6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-button {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #10B981 0%, #06B6D4 50%, #3B82F6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .result-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .recommendation-section {
+                padding: 4rem 1.5rem;
+            }
+
+            .recommendation-title {
+                font-size: 2rem;
+            }
+
+            .recommendation-subtitle {
+                font-size: 1.3rem;
+            }
+
+            .recommendation-form-wrapper {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .recommendation-section {
+                padding: 3rem 1rem;
+            }
+
+            .recommendation-title {
+                font-size: 1.6rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .recommendation-subtitle {
+                font-size: 1rem;
+                margin-top: 0.3rem;
+            }
+
+            .recommendation-form-wrapper {
+                margin: 2rem 0 1.5rem;
+                padding: 1.5rem;
+                border-radius: 12px;
+            }
+
+            .recommendation-form {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 0.5rem;
+            }
+
+            .form-label {
+                font-size: 0.85rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .form-select {
+                padding: 0.65rem 0.8rem;
+                font-size: 0.9rem;
+                width: 100%;
+            }
+
+            .recommendation-button {
+                width: 100%;
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+            }
+
+            .recommendation-loading {
+                padding: 2rem 1rem;
+                border-radius: 12px;
+            }
+
+            .loading-spinner {
+                width: 40px;
+                height: 40px;
+                border: 3px solid #e5e7eb;
+                border-top: 3px solid #10B981;
+            }
+
+            .loading-text {
+                font-size: 0.95rem;
+            }
+
+            .recommendation-result {
+                margin-top: 1.5rem;
+                padding: 1.5rem 1rem;
+                border-radius: 12px;
+            }
+
+            .result-badge {
+                display: block;
+                text-align: center;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+                margin-bottom: 1rem;
+            }
+
+            .result-package {
+                font-size: 1.6rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .result-reason {
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+                line-height: 1.5;
+            }
+
+            .result-metrics {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 1.5rem;
+                border-radius: 8px;
+                margin-bottom: 1.5rem;
+            }
+
+            .metric-item {
+                padding: 1rem;
+            }
+
+            .metric-label {
+                font-size: 0.8rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .metric-value {
+                font-size: 1.4rem;
+            }
+
+            .result-button {
+                padding: 0.9rem;
+                font-size: 0.9rem;
+                border-radius: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .recommendation-section {
+                padding: 2rem 0.75rem;
+            }
+
+            .recommendation-title {
+                font-size: 1.4rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .recommendation-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .recommendation-form-wrapper {
+                margin: 1.5rem 0 1rem;
+                padding: 1rem;
+            }
+
+            .form-select {
+                padding: 0.6rem 0.7rem;
+                font-size: 0.85rem;
+            }
+
+            .recommendation-button {
+                padding: 0.65rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .recommendation-result {
+                padding: 1rem;
+            }
+
+            .result-package {
+                font-size: 1.4rem;
+            }
+
+            .result-metrics {
+                padding: 1rem;
+                gap: 0.8rem;
+            }
+
+            .metric-value {
+                font-size: 1.2rem;
+            }
+
+            .result-button {
+                padding: 0.8rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+        }
+
+        .pricing-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4rem;
+        }
+
+        .pricing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 2px solid rgba(74, 144, 226, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 580px;
+        }
+
+        .pricing-card:hover {
+            box-shadow: 0 12px 40px rgba(74, 144, 226, 0.15);
+            border-color: rgba(74, 144, 226, 0.3);
+        }
+
+        /* Middle Card Highlight */
+        .pricing-card.featured {
+            transform: scale(1.08);
+            box-shadow: 0 20px 60px rgba(74, 144, 226, 0.25);
+            border: 3px solid var(--primary-blue);
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            z-index: 1;
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.1);
+            box-shadow: 0 25px 75px rgba(74, 144, 226, 0.35);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .pricing-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .pricing-volume {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price-currency {
+            font-size: 1.2rem;
+        }
+
+        .pricing-price-period {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .pricing-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .pricing-feature.included {
+            color: var(--text-dark);
+        }
+
+        .pricing-feature.excluded {
+            color: #bdbdbd;
+            opacity: 0.6;
+        }
+
+        .pricing-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .pricing-feature.included .pricing-check {
+            background: linear-gradient(135deg, #4caf50, #81c784);
+            color: white;
+        }
+
+        .pricing-feature.excluded .pricing-check {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        .pricing-button {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-button-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .pricing-button-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.4);
+        }
+
+        .pricing-button-outline {
+            background: transparent;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .pricing-button-outline:hover {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .pricing-button-dark {
+            background: var(--text-dark);
+            color: white;
+            box-shadow: 0 6px 20px rgba(26, 26, 46, 0.2);
+        }
+
+        .pricing-button-dark:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(26, 26, 46, 0.3);
+            background: #000;
+        }
+
+        /* Pricing Responsive */
+        @media (max-width: 1024px) {
+            .pricing-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .pricing-card.featured {
+                grid-column: 1 / -1;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pricing-section {
+                padding: 4rem 0;
+            }
+
+            .pricing-cards {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+                grid-column: auto;
+                max-width: none;
+            }
+
+            .pricing-card.featured:hover {
+                transform: translateY(-5px);
+            }
+
+            .pricing-title {
+                font-size: 1.8rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .pricing-card-title {
+                font-size: 1.2rem;
+            }
+
+            .pricing-price {
+                font-size: 2rem;
+            }
+        }
+
+        /* ROI Calculator Section */
+        .roi-calculator {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #0047b3 0%, #003d82 25%, #001f5c 50%, #0056d4 75%, #1a5cdb 100%);
+            border-top: none;
+            border-bottom: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .roi-calculator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(74, 144, 226, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .roi-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .roi-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 3rem;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            letter-spacing: -1px;
+        }
+
+        .roi-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .roi-slider-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .roi-label {
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .roi-slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.25), rgba(100, 181, 246, 0.4));
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .roi-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #0047b3);
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+            transition: all 0.3s ease;
+            border: 3px solid white;
+        }
+
+        .roi-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.8);
+        }
+
+        .roi-slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #0047b3);
+            border: 3px solid white;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .roi-slider::-moz-range-thumb:hover {
+            transform: scale(1.3);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.8);
+        }
+
+        .roi-value-display {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #00d4ff;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.2rem;
+            border-radius: 15px;
+            border: 2px solid #00d4ff;
+            text-align: center;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .roi-results {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .roi-result-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.88));
+            padding: 2.5rem;
+            border-radius: 20px;
+            border-left: 6px solid #0047b3;
+            box-shadow: 0 10px 40px rgba(0, 47, 167, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .roi-result-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(0, 47, 167, 0.35);
+            border-left-color: #00d4ff;
+        }
+
+        .roi-result-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0047b3;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 0.8rem;
+        }
+
+        .roi-result-value {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #0047b3, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .roi-result-unit {
+            font-size: 1rem;
+            color: #0047b3;
+            font-weight: 600;
+            margin-top: 0.8rem;
+        }
+
+        /* ROI Calculator Responsive */
+        @media (max-width: 768px) {
+            .roi-calculator {
+                padding: 3rem 0;
+            }
+
+            .roi-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .roi-title {
+                font-size: 1.8rem;
+            }
+
+            .roi-result-value {
+                font-size: 2.2rem;
+            }
+
+            .roi-slider-section {
+                padding: 1.5rem;
+            }
+
+            .roi-result-card {
+                padding: 1.8rem;
+            }
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #cffafe 100%);
+        }
+
+        .testimonials-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-blue);
+            font-weight: 700;
+        }
+
+        .testimonials-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 3rem;
+        }
+
+        .testimonials-wrapper {
+            display: flex;
+            overflow-x: auto;
+            gap: 2rem;
+            padding: 1rem 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(74, 144, 226, 0.3) transparent;
+        }
+
+        .testimonials-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .testimonials-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .testimonials-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(74, 144, 226, 0.3);
+            border-radius: 4px;
+        }
+
+        .testimonials-wrapper::-webkit-scrollbar-thumb:hover {
+            background: rgba(74, 144, 226, 0.6);
+        }
+
+        .testimonial-card {
+            flex: 0 0 380px;
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(74, 144, 226, 0.1);
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(74, 144, 226, 0.2);
+        }
+
+        .testimonial-rating {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-star {
+            font-size: 1.2rem;
+            color: #fbbf24;
+        }
+
+        .testimonial-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .testimonial-info h4 {
+            font-size: 1rem;
+            color: var(--dark-blue);
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .testimonial-info p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0.2rem 0 0 0;
+        }
+
+        /* Carousel Navigation */
+        .testimonials-container {
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .scroll-hint {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 1.5rem;
+        }
+
+        /* About Section */
+        .about {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-blue);
+        }
+
+        .about-text p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .about-image {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            height: 400px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            box-shadow: 0 20px 60px rgba(74, 144, 226, 0.3);
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #cffafe 100%);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .about-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(74, 144, 226, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .about-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(74, 144, 226, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        .about-card h3 {
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .about-card p {
+            color: var(--text-light);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 4rem 0;
+            background: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 6rem 0;
+            background: white;
+        }
+
+        .faq-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--dark-blue);
+            font-weight: 700;
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .accordion-item {
+            background: white;
+            border: 2px solid #E3F2FD;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-item:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.1);
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%);
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .accordion-item.active .accordion-header {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+        }
+
+        .accordion-header:hover {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+        }
+
+        .accordion-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .accordion-icon {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            transition: transform 0.3s ease;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(45deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            background: #F9FAFB;
+            border-top: 1px solid #E3F2FD;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+            padding: 2rem;
+            border-top: 2px solid var(--primary-blue);
+        }
+
+        .accordion-content p {
+            color: var(--text-light);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #BBDEFB 0%, #90CAF9 100%);
+        }
+
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #E3F2FD;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1a365d 100%);
+            color: white;
+            padding: 2.5rem 0 1rem;
+            border-top: 3px solid var(--primary-blue);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .footer-logo-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-slogan {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .footer-newsletter {
+            text-align: center;
+        }
+
+        .footer-newsletter-title {
+            font-size: 1.15rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .newsletter-button {
+            padding: 0.9rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .newsletter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(74, 144, 226, 0.5);
+        }
+
+        .footer-social {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1.5rem;
+        }
+
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .social-icon:hover {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            transform: translateY(-3px);
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.3), transparent);
+            margin-bottom: 1rem;
+        }
+
+        .footer-about {
+            padding: 0;
+        }
+
+        .footer-section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 1rem 0 0.5rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .footer-about-link {
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .footer-about-link .footer-section-title {
+            margin: 0;
+        }
+
+        .footer-about-link:hover .footer-section-title {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0 0 1rem 0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            padding-top: 0.5rem;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+        }
+
+        .footer-contact {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .contact-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-value {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .contact-value a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-value a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* Footer Responsive */
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .footer-social {
+                justify-content: center;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-button {
+                width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* WhatsApp Floating Button */
+        .whatsapp-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #25D366, #1fa854);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.35);
+            z-index: 999;
+            transition: all 0.3s ease;
+            font-size: 1.8rem;
+        }
+
+        .whatsapp-button:hover {
+            transform: scale(1.15);
+            box-shadow: 0 12px 35px rgba(37, 211, 102, 0.5);
+            animation: bounce 0.6s ease;
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: 0.9rem 1.2rem;
+            border: 2px solid rgba(74, 144, 226, 0.2);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.2);
+            background: white;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.4);
+        }
+
+        .modal-backdrop.hidden {
+            display: none;
+        }
+
+        /* Modal Responsive */
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 2rem;
+                margin: 20px;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .whatsapp-button {
+                width: 55px;
+                height: 55px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 1.5rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                display: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .clients-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+
+            .bento-card-large {
+                grid-row: auto;
+                min-height: 400px;
+            }
+
+            .bento-card-small {
+                min-height: 250px;
+            }
+
+            .bento-title {
+                font-size: 1.8rem;
+            }
+
+            .bento-card-large .bento-title {
+                font-size: 2rem;
+            }
+
+            .testimonial-card {
+                flex: 0 0 320px;
+            }
+
+            .testimonials-wrapper {
+                gap: 1.5rem;
+            }
+
+            .testimonials-title {
+                font-size: 2rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .about-image {
+                height: 300px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-card {
+                padding: 2rem;
+            }
+
+            .bento-icon {
+                font-size: 2.5rem;
+            }
+
+            .bento-card-large .bento-icon {
+                font-size: 3rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .contact-form {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <nav class="container">
+            <a href="#anasayfa" class="logo">AquaTarget</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#nasil-calisir">Nasıl Çalışır?</a></li>
+                <li><a href="#recommendation">🎯 Strateji Öner</a></li>
+                <li><a href="#pricing">Fiyatlandırma</a></li>
+                <li><a href="#iletisim" class="cta-nav-button">Teklif Al</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="anasayfa">
+        <video class="hero-video" autoplay muted loop playsinline>
+            <source src="assets/heer-bpg.mp4" type="video/mp4">
+        </video>
+        <div class="hero-content">
+            <h1>Markanız <span class="highlight">Her Yudumda</span> Akılda Kalsın</h1>
+            <p>Geleneksel reklamlardan sıkıldınız mı? Hedef kitlenize en doğal ihtiyaçlarıyla ulaşın.</p>
+            <div class="hero-buttons">
+                <a href="#pricing" class="cta-button">Hemen Başla</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat-item">
+                    <div class="hero-stat-number">500K+</div>
+                    <div class="hero-stat-label">Aylık Dağıtım</div>
+                </div>
+                <div class="hero-stat-item">
+                    <div class="hero-stat-number">150+</div>
+                    <div class="hero-stat-label">Kampüs & Etkinlik</div>
+                </div>
+                <div class="hero-stat-item">
+                    <div class="hero-stat-number">%85</div>
+                    <div class="hero-stat-label">Marka Hatırlanma</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Clients/Logos Section -->
+    <section class="clients">
+        <div class="container">
+            <h2 class="clients-title">Geleceğin reklam vizyonuna güvenenler</h2>
+            <div class="clients-grid">
+                <div class="client-logo">
+                    <div class="client-logo-text tech">TechStart</div>
+                </div>
+                <div class="client-logo">
+                    <div class="client-logo-text">FoodCorp</div>
+                </div>
+                <div class="client-logo">
+                    <div class="client-logo-text modern">UniCampus</div>
+                </div>
+                <div class="client-logo">
+                    <div class="client-logo-text">EventPro</div>
+                </div>
+                <div class="client-logo">
+                    <div class="client-logo-text tech">GreenWave</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline-section" id="nasil-calisir">
+        <div class="timeline-container">
+            <h2 class="timeline-title">Nasıl Çalışır?</h2>
+            <p class="timeline-subtitle">5 Adımda Kampanyanız Hayata Geçiyor</p>
+            
+            <div class="timeline-steps">
+                <!-- Step 1 -->
+                <div class="timeline-step">
+                    <div class="timeline-icon-wrapper">
+                        <div class="timeline-icon">📋</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Planlama</h3>
+                        <p>Hedef kitleyi ve dağıtım bölgesini beraber belirliyoruz. Kampanyanızın amacına ve bütçesine uygun strateji oluşturuyoruz.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="timeline-step">
+                    <div class="timeline-icon-wrapper">
+                        <div class="timeline-icon">🎨</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Tasarım</h3>
+                        <p>Şişe etiketini markanıza özel tasarlıyoruz. Kurumsal kimliğinizi yansıtacak ve göz alıcı bir tasarım ortaya çıkarıyoruz.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="timeline-step">
+                    <div class="timeline-icon-wrapper">
+                        <div class="timeline-icon">⚙️</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Üretim</h3>
+                        <p>Yüksek kalitede baskı ve şişeleme yapılıyor. En yüksek kalite standartlarını sağlayarak ürün hazırlanıyor.</p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="timeline-step">
+                    <div class="timeline-icon-wrapper">
+                        <div class="timeline-icon">🚚</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Dağıtım</h3>
+                        <p>Sular kampüslerde, etkinliklerde ve belirlenen alanlarda hedef kitlenizle buluşuyor. Maksimum görünürlük için optimize edilen dağıtım yapılıyor.</p>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="timeline-step">
+                    <div class="timeline-icon-wrapper">
+                        <div class="timeline-icon">📊</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Raporlama</h3>
+                        <p>Dağıtım fotoğrafları, veriler ve detaylı analiz raporları size sunuluyor. Kampanyanızın başarısını ölçülebilir verilerle gösteriyoruz.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Section -->
+    <section class="bento-section" id="nasil-calisir">
+        <div class="container">
+            <h2 class="section-title">Neden AquaTarget?</h2>
+            <div class="bento-grid">
+                <!-- Large Card -->
+                <div class="bento-card bento-card-large">
+                    <div class="bento-icon">📍</div>
+                    <h3 class="bento-title">Gezici Reklam Alanı</h3>
+                    <p class="bento-description">Sabit billboardların aksine, markanız tüketiciyle birlikte tüm şehri dolaşır. Her yudumda marka bilinirliğiniz artar.</p>
+                    <span class="bento-badge">✨ Mobil Pazarlama</span>
+                </div>
+                
+                <!-- Small Card 1 -->
+                <div class="bento-card bento-card-small">
+                    <div>
+                        <div class="bento-icon">⏱️</div>
+                        <h3 class="bento-title">20+ Dakika Odaklanma</h3>
+                        <p class="bento-description">Bir su şişesi ortalama 20 dakika elde tutulur. Markanız bu süre boyunca görünür kalarak hatırlanma oranını artırır.</p>
+                    </div>
+                    <span class="bento-badge">📈 Yüksek Etkileşim</span>
+                </div>
+                
+                <!-- Small Card 2 -->
+                <div class="bento-card bento-card-small">
+                    <div>
+                        <div class="bento-icon">🤝</div>
+                        <h3 class="bento-title">Pozitif Marka Algısı</h3>
+                        <p class="bento-description">Su ikramı markaya sempati kazandırır. Tüketiciler markanızı yardımsever ve düşünceli olarak algılar.</p>
+                    </div>
+                    <span class="bento-badge">❤️ Marka Sadakati</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recommendation Engine Section -->
+    <section class="recommendation-section" id="recommendation">
+        <div class="recommendation-container">
+            <h2 class="recommendation-title">🎯 Hangi Strateji Size Uygun mu? <span class="recommendation-subtitle">Yapay Zeka ile Hesaplayın</span></h2>
+            
+            <div class="recommendation-form-wrapper">
+                <div class="recommendation-form">
+                    <div class="form-group">
+                        <label class="form-label">🏢 Sektörünüz</label>
+                        <select class="form-select" id="recSector">
+                            <option value="">-- Seçiniz --</option>
+                            <option value="egitim">🎓 Eğitim & Üniversiteler</option>
+                            <option value="teknoloji">💻 Teknoloji & IT</option>
+                            <option value="gida">🍔 Gıda & İçecek</option>
+                            <option value="perakende">🛍️ Perakende & AVM</option>
+                            <option value="saglik">⚕️ Sağlık & Wellness</option>
+                            <option value="spor">⚽ Spor & Fitness</option>
+                            <option value="finans">💰 Finans & Bankacılık</option>
+                            <option value="turizm">✈️ Turizm & Otelcilik</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">👥 Hedef Kitleniz</label>
+                        <select class="form-select" id="recAudience">
+                            <option value="">-- Seçiniz --</option>
+                            <option value="ogrenciler">👨‍🎓 Üniversite Öğrencileri</option>
+                            <option value="beyaz-yaka">💼 Beyaz Yaka / Profesyoneller</option>
+                            <option value="sporcular">🏃 Sporcu & Aktif Yaşayanlar</option>
+                            <option value="aile">👨‍👩‍👧 Aileler</option>
+                            <option value="turist">✈️ Turist & Gezginler</option>
+                            <option value="genel">🌍 Genel Halk (Tümü)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">💰 Bütçe Aralığı</label>
+                        <select class="form-select" id="recBudget">
+                            <option value="">-- Seçiniz --</option>
+                            <option value="dusuk">💚 Düşük (5K-15K TL)</option>
+                            <option value="orta">🟡 Orta (15K-50K TL)</option>
+                            <option value="yuksek">❤️ Yüksek (50K+ TL)</option>
+                        </select>
+                    </div>
+
+                    <button class="recommendation-button" onclick="analyzeStrategy()">⚡ Analiz Et ve Öner</button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="recommendation-loading" id="recLoading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">📊 Veriler İşleniyor...</div>
+            </div>
+
+            <!-- Result Card -->
+            <div class="recommendation-result" id="recResult" style="display: none;">
+                <div class="result-badge">✨ ÖNERİLEN STRATEJİ</div>
+                <div style="font-size: 0.9rem; background: linear-gradient(135deg, #10B981, #06B6D4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; font-weight: 600;">📦 Önerilen Paket:</div>
+                <div class="result-package" id="resultPackage">Kampüs Dominasyonu</div>
+                <p class="result-reason" id="resultReason">Verilerimize göre öğrenciler günde ortalama 4 saat kampüs içinde bulunuyor. Markanız ders aralarında en yüksek etkileşimi alacak.</p>
+                
+                <div class="result-metrics">
+                    <div class="metric-item">
+                        <div class="metric-label">Uyum Oranı</div>
+                        <div class="metric-value" id="resultScore">95%</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Beklenen ROI</div>
+                        <div class="metric-value" id="resultROI">Yüksek</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Tahmini Süre</div>
+                        <div class="metric-value" id="resultDuration">4 Hafta</div>
+                    </div>
+                </div>
+
+                <button class="result-button" onclick="contactViaWhatsApp()">🚀 Hemen Bu Paketi Seç</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing-section" id="pricing">
+        <div class="pricing-container">
+            <h2 class="pricing-title">Bütçenize Uygun Dağıtım Paketleri</h2>
+            
+            <div class="pricing-cards">
+                <!-- Card 1: Etkinlik Paketi -->
+                <div class="pricing-card">
+                    <h3 class="pricing-card-title">Etkinlik Paketi</h3>
+                    <p class="pricing-volume">1.000 Şişe</p>
+                    <div class="pricing-price"><span class="pricing-price-currency">₺</span>15.000</div>
+                    <p class="pricing-price-period">Tek dağıtım</p>
+                    
+                    <ul class="pricing-features">
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>Tek Lokasyon Dağıtımı</span>
+                        </li>
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>Standart Etiket Tasarımı</span>
+                        </li>
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>Dağıtım Fotoğrafları</span>
+                        </li>
+                        <li class="pricing-feature excluded">
+                            <span class="pricing-check">✗</span>
+                            <span>Raporlama Yok</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="pricing-button pricing-button-outline" onclick="openModal('Etkinlik Paketi')">Bunu Seç</button>
+                </div>
+
+                <!-- Card 2: Kampüs Paketi (Featured) -->
+                <div class="pricing-card featured">
+                    <span class="pricing-badge">En Çok Tercih Edilen</span>
+                    <h3 class="pricing-card-title">Kampüs Paketi</h3>
+                    <p class="pricing-volume">5.000 Şişe</p>
+                    <div class="pricing-price"><span class="pricing-price-currency">₺</span>60.000</div>
+                    <p class="pricing-price-period">Kampanya paketi</p>
+                    
+                    <ul class="pricing-features">
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>3 Farklı Üniversite Kampüsü</span>
+                        </li>
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>Özel Tasarım Etiket</span>
+                        </li>
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>QR Kod ile Link Yönlendirme</span>
+                        </li>
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>Erişim Raporu (Temel)</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="pricing-button pricing-button-primary" onclick="openModal('Kampüs Paketi')">Hemen Başla</button>
+                </div>
+
+                <!-- Card 3: Şehir Dominasyonu -->
+                <div class="pricing-card">
+                    <h3 class="pricing-card-title">Şehir Dominasyonu</h3>
+                    <p class="pricing-volume">20.000+ Şişe</p>
+                    <div class="pricing-price">Özel Teklif</div>
+                    <p class="pricing-price-period">Kurumsal paket</p>
+                    
+                    <ul class="pricing-features">
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>Tüm Şehir / Meydanlar</span>
+                        </li>
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>A/B Testi İmkanı</span>
+                        </li>
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>Detaylı QR ve Dönüşüm Analizi</span>
+                        </li>
+                        <li class="pricing-feature included">
+                            <span class="pricing-check">✓</span>
+                            <span>Özel Proje Yöneticisi</span>
+                        </li>
+                    </ul>
+                    
+                    <button class="pricing-button pricing-button-dark" onclick="openModal('Şehir Dominasyonu')">Teklif İste</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROI Calculator Section -->
+    <section class="roi-calculator" id="roi-calculator">
+        <div class="roi-container">
+            <h2 class="roi-title">Etki Hesaplayıcısı</h2>
+            
+            <div class="roi-content">
+                <!-- Slider Section -->
+                <div class="roi-slider-section">
+                    <label class="roi-label">Dağıtılacak Su Şişesi Sayısı</label>
+                    <input type="range" id="roiSlider" class="roi-slider" min="1000" max="50000" step="500" value="10000">
+                    <div class="roi-value-display">
+                        <span id="roiValue">10.000</span> şişe
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="roi-results">
+                    <div class="roi-result-card">
+                        <div class="roi-result-label">Tahmini Görüntülenme</div>
+                        <div class="roi-result-value" id="roiImpression">30.000</div>
+                        <div class="roi-result-unit">kişiye ulaş</div>
+                    </div>
+                    <div class="roi-result-card">
+                        <div class="roi-result-label">Markayla Temas Süresi</div>
+                        <div class="roi-result-value" id="roiContact">200.000</div>
+                        <div class="roi-result-unit">dakika toplam temas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section" id="testimonials">
+        <div class="testimonials-container">
+            <h2 class="testimonials-title">Başarı Hikayeleri</h2>
+            <p class="testimonials-subtitle">Markaları bizimle yeniden keşfeden şirketler ne diyor?</p>
+            
+            <div class="testimonials-wrapper">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Kampüs etkinliklerimizde AquaTarget ile binlerce öğrenciye ulaştık, geri dönüşler harikaydı. Markayla etkileşim hiç bu kadar doğal olmamıştı."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">EY</div>
+                        <div class="testimonial-info">
+                            <h4>Elif Y.</h4>
+                            <p>Pazarlama Müdürü</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Fuar alanında broşürlerimiz çöpe atıldı ama logolu sularımız herkesin elindeydi. ROI açısından en iyi yatırımlarımızdan biri oldu."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">MK</div>
+                        <div class="testimonial-info">
+                            <h4>Mert K.</h4>
+                            <p>Girişimci</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Hem susuzluk giderdik hem markamızı tanıttık. Çok akıllıca bir strateji. Tüm etkinlik organizatörleri bunu denemelidir."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">CT</div>
+                        <div class="testimonial-info">
+                            <h4>Canan T.</h4>
+                            <p>Organizasyon Şirketi CEO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 4 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Sosyal medyada #AquaTarget etiketiyle binlerce paylaşım gördük. Organik ulaşımımız önceki kampanyalardan 3 kat daha fazla."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">BÖ</div>
+                        <div class="testimonial-info">
+                            <h4>Burak Ö.</h4>
+                            <p>Dijital Pazarlama Uzmanı</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 5 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Sürdürülebilir pazarlamaya geçmek istiyorduk ve AquaTarget tam da bunu sağladı. Hem marka imajımız hem de çevre bilincimiz arttı."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">SY</div>
+                        <div class="testimonial-info">
+                            <h4>Seda Y.</h4>
+                            <p>Sürdürülebilirlik Direktörü</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 6 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Milyonluk bütçeli kampanyalardan daha iyi sonuç aldık. Hedef kitle ile en doğal yoldan bağlantı kurduk."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">AŞ</div>
+                        <div class="testimonial-info">
+                            <h4>Ahmet Ş.</h4>
+                            <p>Brand Manager</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 7 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Başlangıçta şüphelerim vardı ama sonuçlar konuşuyor. İkinci yılımız için bile daha büyük bir bütçe ayırdık."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">NÜ</div>
+                        <div class="testimonial-info">
+                            <h4>Nazlı Ü.</h4>
+                            <p>Reklam Ajansı Sahibi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 8 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Üniversite öğrenci kulübümüz için AquaTarget'ı seçtik. Sponsor bulması çok kolaylaştı, çünkü ROI çok açık."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">GD</div>
+                        <div class="testimonial-info">
+                            <h4>Gökhan D.</h4>
+                            <p>Öğrenci Kulübü Başkanı</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 9 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Olay alanında binlerce kişiye fiziksel olarak markayla temas sağladık. Dijital pazarlamada bunu başarması imkansız."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">MB</div>
+                        <div class="testimonial-info">
+                            <h4>Mehmet B.</h4>
+                            <p>Etkinlik Yöneticisi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 10 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                        <span class="testimonial-star">⭐</span>
+                    </div>
+                    <p class="testimonial-text">"Genç kitleyi hedeflemek istiyorsak bu kesinlikle doğru yol. AquaTarget'la sadık müşteri tabanı oluşturduk."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">LS</div>
+                        <div class="testimonial-info">
+                            <h4>Leyla S.</h4>
+                            <p>Müşteri Temsilcisi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scroll-hint">← Sağa-sola kaydırarak diğer hikayeleri görüntüleyin →</div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Mutlu Müşteri</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1M+</div>
+                    <div class="stat-label">Litre Su Tasarrufu</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">%40</div>
+                    <div class="stat-label">Ortalama Tasarruf</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Destek Hizmeti</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section" id="faq">
+        <div class="faq-container">
+            <h2 class="faq-title">Sıkça Sorulan Sorular</h2>
+            
+            <div class="accordion-item active">
+                <div class="accordion-header">
+                    <h3 class="accordion-title">
+                        <span class="accordion-icon">+</span>
+                        Minimum sipariş adedi nedir?
+                    </h3>
+                </div>
+                <div class="accordion-content">
+                    <p>Kampanyalarımız 1.000 adet şişeden başlamaktadır. Böyle bir miktar ile zaten gözle görünür alanlı etkinliklere ulaşmak mümkün oluyor. Daha büyük hacimler için ise özel fiyatlandırma sunuyoruz.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <h3 class="accordion-title">
+                        <span class="accordion-icon">+</span>
+                        Hangi bölgelerde dağıtım yapıyorsunuz?
+                    </h3>
+                </div>
+                <div class="accordion-content">
+                    <p>Başta üniversite kampüleri olmak üzere; fuarlar, festivaller, spor etkinlikleri ve şehir meydanlarında aktifiz. Tamamında İstanbul merkez olmak üzere ana bölgeleri kapsayan bir ağı bulunmaktadır. Hedef bölge için özel kampanya planlaması sunabiliriz.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <h3 class="accordion-title">
+                        <span class="accordion-icon">+</span>
+                        Tasarımı kim yapıyor?
+                    </h3>
+                </div>
+                <div class="accordion-content">
+                    <p>Kendi tasarım ekibimiz veya sizin ajansınız etiketi tasarlayabilir. Markanızın kurumsal kimliğini mükemmel şekilde yansıtacak şekilde özel olarak tasarlanacaktır. Tasarım süreci boyunca sizle yakın işbirliği sağlayacağız.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <h3 class="accordion-title">
+                        <span class="accordion-icon">+</span>
+                        Kampanya süresi ne kadar?
+                    </h3>
+                </div>
+                <div class="accordion-content">
+                    <p>Kampanya süresi sizin ihtiyaçlarına göre değişmektedir. 1 ayından 1 yıla kadar değişen süreler içerisinde kampanyalar yapılabilir. Mevsümsel etkinliklere yönelik kısa vadeli ve markalandırma için uzun vadeli kampanyalar sunabiliyoruz.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <h3 class="accordion-title">
+                        <span class="accordion-icon">+</span>
+                        Ödeme ve Teslimat Nedir?
+                    </h3>
+                </div>
+                <div class="accordion-content">
+                    <p>Ödeme şartlarımız esnek ve sizin iş süreci içerisinde ayarlanabilir. Ön ödeme ve taksit seçenekleri sunuyoruz. Teslimat sizin belirttiğiniz etkinlik yerine veya depo adresine yapılabilir. Express teslimat hizmeti de mevcuttur.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <h3 class="accordion-title">
+                        <span class="accordion-icon">+</span>
+                        Etkin Reklam Ölçümleri Nelerdir?
+                    </h3>
+                </div>
+                <div class="accordion-content">
+                    <p>Kampanyanızın etkinliğini ölçümek için sosyal medya takip edilerek, hashtag analizi yapılarak, direkt temas bilgisi toplanmasıyla ve KPI'lar izlenerek takip yapılır. Kampanyanın sonuçları içeren detaylı raporlar sunuyoruz.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="teklif-al">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Logo & Slogan -->
+                <div class="footer-logo-section">
+                    <h3>🌊 AquaTarget</h3>
+                    <p class="footer-slogan">Yeni Nesil Reklam Ağı</p>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="footer-newsletter">
+                    <div class="footer-newsletter-title">Kampanyalardan haberdar olmak için bültene abone olun</div>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <input 
+                            type="email" 
+                            class="newsletter-input" 
+                            placeholder="Kurumsal E-mail adresiniz" 
+                            required
+                        >
+                        <button type="submit" class="newsletter-button">Gönder</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="footer-about">
+                <a href="hakkimizda.html" class="footer-about-link">
+                    <h4 class="footer-section-title">Biz Kimiz?</h4>
+                </a>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="footer-contact" id="iletisim">
+                <div class="contact-item">
+                    <span class="contact-label">📞 Telefon</span>
+                    <span class="contact-value"><a href="tel:+902125551234">+90 (212) 555 1234</a></span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">📧 E-mail</span>
+                    <span class="contact-value"><a href="mailto:info@aquatarget.com">info@aquatarget.com</a></span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">📍 Adres</span>
+                    <span class="contact-value">İstanbul, Türkiye</span>
+                </div>
+            </div>
+        </div>
+
+            <div class="footer-divider"></div>
+
+            <!-- Copyright -->
+            <div class="footer-bottom">
+                <p>&copy; 2025 AquaTarget All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/905417438026" target="_blank" class="whatsapp-button" title="Bize WhatsApp'dan Sorun">
+        💬
+    </a>
+
+    <!-- Teklif Formu Modal -->
+    <div class="modal-backdrop" id="offerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Özel Teklif Al</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            
+            <form id="offerForm">
+                <div class="form-group">
+                    <label class="form-label">Ad Soyad</label>
+                    <input type="text" class="form-input" id="fullName" placeholder="Adınız ve soyadınız" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Şirket Adı</label>
+                    <input type="text" class="form-input" id="companyName" placeholder="Şirketinizin adı" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">E-posta</label>
+                    <input type="email" class="form-input" id="email" placeholder="E-posta adresiniz" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Telefon</label>
+                    <input type="tel" class="form-input" id="phone" placeholder="Telefon numaranız">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">İlgilendiğiniz Paket</label>
+                    <input type="text" class="form-input" id="selectedPackage" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mesajınız</label>
+                    <textarea class="form-textarea" id="message" placeholder="Kampanyanız hakkında detayları yazın..." required></textarea>
+                </div>
+
+                <button type="submit" class="form-submit">Teklifi Gönder</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Glassmorphism scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        const navItems = document.querySelectorAll('.nav-links a');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Timeline scroll animation
+        function animateTimeline() {
+            const timelineSteps = document.querySelectorAll('.timeline-step');
+            
+            timelineSteps.forEach((step, index) => {
+                const stepTop = step.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (stepTop < windowHeight * 0.8) {
+                    step.classList.add('active');
+                    step.style.opacity = '1';
+                    step.style.transform = 'translateX(0)';
+                }
+            });
+        }
+
+        window.addEventListener('scroll', animateTimeline);
+        window.addEventListener('load', animateTimeline);
+
+        // Auto-scroll testimonials
+        const testimonialsWrapper = document.querySelector('.testimonials-wrapper');
+        if (testimonialsWrapper) {
+            let scrollPosition = 0;
+            const cardWidth = 380 + 32; // Card width + gap
+            const scrollInterval = 5000; // 5 seconds
+            const maxScroll = testimonialsWrapper.scrollWidth - testimonialsWrapper.clientWidth;
+
+            setInterval(() => {
+                scrollPosition += cardWidth;
+                if (scrollPosition > maxScroll) {
+                    scrollPosition = 0;
+                }
+                testimonialsWrapper.scrollTo({
+                    left: scrollPosition,
+                    behavior: 'smooth'
+                });
+            }, scrollInterval);
+        }
+
+        // ROI Calculator functionality
+        const roiSlider = document.getElementById('roiSlider');
+        const roiValue = document.getElementById('roiValue');
+        const roiImpression = document.getElementById('roiImpression');
+        const roiContact = document.getElementById('roiContact');
+
+        function updateROI() {
+            const value = parseInt(roiSlider.value);
+            const impression = value * 3;
+            const contact = value * 20;
+
+            roiValue.textContent = value.toLocaleString('tr-TR');
+            roiImpression.textContent = impression.toLocaleString('tr-TR');
+            roiContact.textContent = contact.toLocaleString('tr-TR');
+        }
+
+        roiSlider.addEventListener('input', updateROI);
+
+        // Recommendation Engine functionality
+        function analyzeStrategy() {
+            const sector = document.getElementById('recSector').value;
+            const audience = document.getElementById('recAudience').value;
+            const budget = document.getElementById('recBudget').value;
+
+            if (!sector || !audience || !budget) {
+                alert('Lütfen tüm alanları doldurunuz!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('recLoading').style.display = 'block';
+            document.getElementById('recResult').style.display = 'none';
+
+            // Simulate 2-second analysis
+            setTimeout(() => {
+                document.getElementById('recLoading').style.display = 'none';
+                
+                let packageName = 'Şehir Meydanı Paketi';
+                let reason = 'Geniş hedef kitleye ulaşmak için şehir meydanlarında stratejik konumlarda dağıtım yapmanızı öneriyoruz.';
+                let score = '75%';
+                let roi = 'Orta';
+                let duration = '6 Hafta';
+
+                // Senaryo 1: Öğrenci + Eğitim
+                if (sector === 'egitim' && audience === 'ogrenciler') {
+                    packageName = 'Kampüs Dominasyonu';
+                    reason = 'Verilerimize göre öğrenciler günde ortalama 4 saat kampüs içinde bulunuyor. Markanız ders aralarında en yüksek etkileşimi alacak.';
+                    score = '95%';
+                    roi = 'Çok Yüksek';
+                    duration = '4 Hafta';
+                }
+                // Senaryo 2: Beyaz Yaka + Teknoloji
+                else if (sector === 'teknoloji' && audience === 'beyaz-yaka') {
+                    packageName = 'Plaza & Ofis Ağı';
+                    reason = 'Ofis çalışanlarının masalarında su dağıtımıyla ortalama 45 dakika kalıyor. Odaklanma anında markanız yanlarında olsun.';
+                    score = '92%';
+                    roi = 'Çok Yüksek';
+                    duration = '5 Hafta';
+                }
+                // Senaryo 3: Gıda
+                else if (sector === 'gida') {
+                    packageName = 'Gıda Etkinlikleri & Fuarlar';
+                    reason = 'Gıda sektöründe etkinliklerde markanız doğrudan hedef kitlenizle buluşabilir. Brand trial ve fidelity en yüksek.';
+                    score = '88%';
+                    roi = 'Yüksek';
+                    duration = '5 Hafta';
+                }
+                // Senaryo 4: Perakende
+                else if (sector === 'perakende') {
+                    packageName = 'AVM & Alışveriş Bölgeleri';
+                    reason = 'Alışveriş merkezlerinde yüksek yoğunluk vardır. Markanız müşterilerin en aktif saatlerinde onlarla buluşacak.';
+                    score = '86%';
+                    roi = 'Yüksek';
+                    duration = '6 Hafta';
+                }
+                // Senaryo 5: Sağlık + Spor
+                else if (sector === 'saglik' || sector === 'spor') {
+                    if (audience === 'sporcular') {
+                        packageName = 'Spor Tesisleri & Atletizm';
+                        reason = 'Sporcu ve aktif yaşayanlar spor tesislerinde yoğun zaman geçirir. Sağlıklı yaşam hedefinin merkezinde markanız olacak.';
+                        score = '91%';
+                        roi = 'Çok Yüksek';
+                    } else {
+                        packageName = 'Wellness & Fitness Ağı';
+                        reason = 'Sağlık ve wellness alanında markanız güven ve fayda sunması ile öne çıkacak.';
+                        score = '84%';
+                        roi = 'Yüksek';
+                    }
+                    duration = '5 Hafta';
+                }
+                // Senaryo 6: Finans
+                else if (sector === 'finans') {
+                    packageName = 'Corporate & Executive Ağı';
+                    reason = 'Finansal profesyoneller yüksek konsantrasyon gerektirir. Markanız odaklanma anında yanlarında olacak.';
+                    score = '87%';
+                    roi = 'Yüksek';
+                    duration = '6 Hafta';
+                }
+                // Senaryo 7: Turizm
+                else if (sector === 'turizm') {
+                    if (audience === 'turist') {
+                        packageName = 'Turist Rotaları & Landmark';
+                        reason = 'Turist ve gezginler şehirdeki popüler alanlarda zaman geçirir. Markanız kültürel deneyimlerin parçası olacak.';
+                        score = '89%';
+                        roi = 'Çok Yüksek';
+                    } else {
+                        packageName = 'Otel & Resort Ağı';
+                        reason = 'Konuklar otel alanlarında rahat atmosferde vakit geçirir. Marka deneyimi en üst seviyede sağlanır.';
+                        score = '85%';
+                        roi = 'Yüksek';
+                    }
+                    duration = '7 Hafta';
+                }
+                // Aile hedef kitlesi için özel
+                else if (audience === 'aile') {
+                    packageName = 'Aile Mekanları Ağı';
+                    reason = 'Aileler alışveriş ve rekreasyon merkezlerinde vakit geçirir. Markanız aile değerlerini yansıtacak.';
+                    score = '83%';
+                    roi = 'Orta-Yüksek';
+                    duration = '6 Hafta';
+                }
+                // Genel halk için
+                else if (audience === 'genel') {
+                    packageName = 'Geniş Çaplı Şehir Kampanyası';
+                    reason = 'Tüm demografiye ulaşmak için çok yönlü strateji. Şehir genelinde maksimum görünürlük sağlanır.';
+                    score = '80%';
+                    roi = 'Orta';
+                    duration = '8 Hafta';
+                }
+
+                // Bütçe kontrolü
+                if (budget === 'dusuk') {
+                    score = Math.max(60, parseInt(score) - 8) + '%';
+                    roi = 'Orta';
+                    duration = parseInt(duration) + 2 + ' Hafta';
+                } else if (budget === 'yuksek') {
+                    score = Math.min(99, parseInt(score) + 3) + '%';
+                }
+
+                // Update result card
+                document.getElementById('resultPackage').textContent = packageName;
+                document.getElementById('resultReason').textContent = reason;
+                document.getElementById('resultScore').textContent = score;
+                document.getElementById('resultROI').textContent = roi;
+                document.getElementById('resultDuration').textContent = duration;
+
+                // Show result
+                document.getElementById('recResult').style.display = 'block';
+            }, 2000);
+        }
+
+        function scrollToPricing() {
+            const pricingSection = document.getElementById('pricing');
+            pricingSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        async function contactViaWhatsApp() {
+            const packageName = document.getElementById('resultPackage').textContent;
+            const sector = document.getElementById('recSector').value;
+            const audience = document.getElementById('recAudience').value;
+            const budget = document.getElementById('recBudget').value;
+            const score = document.getElementById('resultScore').textContent;
+            const roi = document.getElementById('resultROI').textContent;
+            const duration = document.getElementById('resultDuration').textContent;
+
+            // Strateji önerisini veritabanına kaydet
+            try {
+                const response = await fetch('http://localhost:3000/api/save-recommendation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sector: sector,
+                        audience: audience,
+                        budget: budget,
+                        recommended_package: packageName,
+                        score: parseInt(score),
+                        roi: roi,
+                        duration: duration
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Strateji önerisi kaydedildi!');
+                }
+            } catch (error) {
+                console.error('Kayıt hatası:', error);
+            }
+
+            const message = `Merhaba! "${packageName}" paketiniz hakkında detaylı bilgi almak istiyorum.`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/905417438026?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // FAQ Accordion functionality
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            header.addEventListener('click', () => {
+                // Close other items
+                accordionItems.forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                // Toggle current item
+                item.classList.toggle('active');
+            });
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Close mobile menu if open
+                    navLinks.classList.remove('active');
+                }
+            });
+        });
+
+        // Newsletter form submission
+        const newsletterForm = document.getElementById('newsletterForm');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = newsletterForm.querySelector('.newsletter-input').value;
+                alert('Teşekkürler! ' + email + ' adresine confirm maili gönderilmiştir.');
+                newsletterForm.reset();
+            });
+        }
+
+                // Modal functionality
+        const offerModal = document.getElementById('offerModal');
+        const modalClose = document.getElementById('modalClose');
+        const offerForm = document.getElementById('offerForm');
+
+        function openModal(packageName = 'Genel Teklif') {
+            offerModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Paket adını form inputuna yaz
+            const packageInput = document.getElementById('selectedPackage');
+            if (packageInput) {
+                packageInput.value = packageName;
+            }
+        }
+
+        function closeModal() {
+            offerModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        modalClose.addEventListener('click', closeModal);
+
+        offerModal.addEventListener('click', (e) => {
+            if (e.target === offerModal) {
+                closeModal();
+            }
+        });
+
+        offerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const company = document.getElementById('companyName').value;
+            const message = document.getElementById('message').value;
+            
+            // Paketi formdan al
+            const packageInput = document.getElementById('selectedPackage');
+            let packageName = 'Genel Teklif';
+            if (packageInput && packageInput.value) {
+                packageName = packageInput.value;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/select-package', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        package_name: packageName,
+                        customer_name: fullName,
+                        email: email,
+                        phone: phone,
+                        company: company,
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Teşekkürler ${fullName}! Talebiniz veritabanına kaydedildi. En kısa sürede sizinle iletişime geçeceğiz.`);
+                } else {
+                    alert('Bir hata oluştu: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Kayıt hatası:', error);
+                alert('Talebiniz alındı ancak kayıt sırasında bir sorun oluştu.');
+            }
+
+            offerForm.reset();
+            closeModal();
+        });
+
+        // Escape key ile modal kapatma
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

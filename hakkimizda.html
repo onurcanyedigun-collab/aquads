@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hakkımızda - AquaTarget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #4A90E2;
+            --light-blue: #E3F2FD;
+            --dark-blue: #2C5F8D;
+            --accent-blue: #64B5F6;
+            --text-dark: #1A1A2E;
+            --text-light: #6B7280;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 50%, #90CAF9 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .logo::before {
+            content: '💧';
+            font-size: 1.5rem;
+            -webkit-text-fill-color: initial;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 0.5rem;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 6rem 0;
+            min-height: 80vh;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            color: var(--dark-blue);
+            font-weight: 700;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .about-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(74, 144, 226, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .about-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(74, 144, 226, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        .about-card h3 {
+            font-size: 2rem;
+            color: var(--dark-blue);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .about-card p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: block;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1a365d 100%);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            border-top: 3px solid var(--primary-blue);
+            margin-top: 4rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.6);
+            padding-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: white;
+                gap: 0;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                border-bottom: 2px solid var(--primary-blue);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                padding: 1rem 2rem;
+                border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+            }
+
+            .nav-links li:last-child {
+                border-bottom: none;
+            }
+
+            .nav-links a {
+                display: block;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .about-grid {
+                gap: 2rem;
+            }
+
+            .about-card h3 {
+                font-size: 1.5rem;
+            }
+
+            .about-card {
+                padding: 2rem;
+            }
+
+            .cta-button {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav {
+                padding: 0.8rem 0;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .nav-links {
+                top: 60px;
+            }
+
+            .nav-links li {
+                padding: 0.8rem 1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .about-card {
+                padding: 1.5rem;
+            }
+
+            .about-card h3 {
+                font-size: 1.3rem;
+            }
+
+            .cta-button {
+                padding: 0.9rem 1.5rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">AquaTarget</a>
+            <ul class="nav-links">
+                <li><a href="index.html#nasil-calisir">Nasıl Çalışır?</a></li>
+                <li><a href="index.html#pricing" style="background: linear-gradient(135deg, #4A90E2, #64B5F6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600;">Teklif Al</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="container">
+            <h1 class="section-title">Hakkımızda</h1>
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3>Biz Kimiz?</h3>
+                    <p>AquaTarget, su şişeleri üzerinde markaları hedef kitleyle buluşturan yenilikçi bir reklam ağıdır. Geleneksel reklamcılığın ötesine geçerek, en doğal ve etkili pazarlama çözümü sunuyoruz. Her su şişesini bir markaya olan bağlılığı arttıran bir araç olarak görüyoruz.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Misyon</h3>
+                    <p>Markaların tüketicilere en doğal ve etkin yoldan ulaşmasını sağlamak. Her su şişesini bir pazarlama fırsatına dönüştürerek, marka bilinirliğini güçlendirmek ve tüketiciyle anlamlı bağlantılar kurmak. İnsanların en temel ihtiyaçlarıyla (suyla) markalar arasında pozitif bir ilişki yaratmak.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Vizyon</h3>
+                    <p>Geleneksel reklamcılığa alternatif, yaratıcı ve sürdürülebilir bir platform olmak. Dünyada en güvenilir su şişesi reklam ağı haline gelmek. Markaları ve tüketicileri birleştiren, sosyal sorumluluk taşıyan ve çevre dostu çözümler sunmak.</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 4rem;">
+                <h2 style="color: var(--dark-blue); font-size: 2rem; margin-bottom: 1rem;">Bir Kampanya Başlatmaya Hazır mısınız?</h2>
+                <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem;">Markanızı binlerce kişiye ulaştırın. Hemen bize başvurun!</p>
+                <a href="index.html#pricing" class="cta-button">Teklif Al</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 AquaTarget All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        const navItems = document.querySelectorAll('.nav-links a');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

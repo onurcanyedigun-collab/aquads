@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaDS - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #4A90E2;
+            --light-blue: #E3F2FD;
+            --dark-blue: #2C5F8D;
+            --accent-blue: #64B5F6;
+            --text-dark: #1A1A2E;
+            --text-light: #6B7280;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 50%, #90CAF9 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-title {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-title::before {
+            content: '💧';
+            font-size: 2.5rem;
+        }
+
+        .refresh-button {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .refresh-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(74, 144, 226, 0.5);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--light-blue), var(--accent-blue));
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 1rem 2rem;
+            background: white;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: var(--light-blue);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .data-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-blue);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        tbody tr:hover {
+            background: var(--light-blue);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: var(--warning);
+        }
+
+        .badge-info {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--primary-blue);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-blue);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .export-button {
+            padding: 0.6rem 1.2rem;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .export-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--light-blue);
+            border-radius: 10px;
+            font-size: 1rem;
+            width: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .admin-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1 class="admin-title">Admin Panel</h1>
+            <button class="refresh-button" onclick="loadAllData()">🔄 Yenile</button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-info">
+                    <div class="stat-label">Toplam Paket Seçimi</div>
+                    <div class="stat-value" id="statPackages">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-info">
+                    <div class="stat-label">Strateji Önerileri</div>
+                    <div class="stat-value" id="statRecommendations">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📧</div>
+                <div class="stat-info">
+                    <div class="stat-label">İletişim Formları</div>
+                    <div class="stat-value" id="statContacts">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('packages')">📦 Paket Seçimleri</button>
+            <button class="tab-button" onclick="switchTab('recommendations')">🎯 Strateji Önerileri</button>
+            <button class="tab-button" onclick="switchTab('contacts')">📧 İletişim Formları</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <!-- Packages Tab -->
+        <div id="packages-tab" class="tab-content active">
+            <div class="data-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="section-title" style="margin: 0; border: none;">Paket Seçimleri</h2>
+                    <button class="export-button" onclick="exportToCSV('packages')">📥 CSV İndir</button>
+                </div>
+                <input type="text" class="search-box" id="searchPackages" placeholder="🔍 Müşteri adı, email, paket ara..." onkeyup="filterTable('packagesTable', this.value)">
+                <div id="packagesLoading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Veriler yükleniyor...</p>
+                </div>
+                <div id="packagesContent" style="display: none;">
+                    <div class="table-container">
+                        <table id="packagesTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Paket Adı</th>
+                                    <th>Müşteri Adı</th>
+                                    <th>Email</th>
+                                    <th>Telefon</th>
+                                    <th>Şirket</th>
+                                    <th>Mesaj</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="packagesBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Tab -->
+        <div id="recommendations-tab" class="tab-content">
+            <div class="data-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="section-title" style="margin: 0; border: none;">Strateji Önerileri</h2>
+                    <button class="export-button" onclick="exportToCSV('recommendations')">📥 CSV İndir</button>
+                </div>
+                <input type="text" class="search-box" id="searchRecommendations" placeholder="🔍 Sektör, hedef kitle ara..." onkeyup="filterTable('recommendationsTable', this.value)">
+                <div id="recommendationsLoading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Veriler yükleniyor...</p>
+                </div>
+                <div id="recommendationsContent" style="display: none;">
+                    <div class="table-container">
+                        <table id="recommendationsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Sektör</th>
+                                    <th>Hedef Kitle</th>
+                                    <th>Bütçe</th>
+                                    <th>Önerilen Paket</th>
+                                    <th>Skor</th>
+                                    <th>ROI</th>
+                                    <th>Süre</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recommendationsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Tab -->
+        <div id="contacts-tab" class="tab-content">
+            <div class="data-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="section-title" style="margin: 0; border: none;">İletişim Formları</h2>
+                    <button class="export-button" onclick="exportToCSV('contacts')">📥 CSV İndir</button>
+                </div>
+                <input type="text" class="search-box" id="searchContacts" placeholder="🔍 İsim, email ara..." onkeyup="filterTable('contactsTable', this.value)">
+                <div id="contactsLoading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Veriler yükleniyor...</p>
+                </div>
+                <div id="contactsContent" style="display: none;">
+                    <div class="table-container">
+                        <table id="contactsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>İsim</th>
+                                    <th>Email</th>
+                                    <th>Telefon</th>
+                                    <th>Şirket</th>
+                                    <th>Mesaj</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contactsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Add active to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('statPackages').textContent = data.stats.totalPackages;
+                    document.getElementById('statRecommendations').textContent = data.stats.totalRecommendations;
+                    document.getElementById('statContacts').textContent = data.stats.totalContacts;
+                }
+            } catch (error) {
+                console.error('İstatistik yükleme hatası:', error);
+            }
+        }
+
+        // Load packages
+        async function loadPackages() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/packages`);
+                const data = await response.json();
+                
+                document.getElementById('packagesLoading').style.display = 'none';
+                document.getElementById('packagesContent').style.display = 'block';
+                
+                const tbody = document.getElementById('packagesBody');
+                tbody.innerHTML = '';
+                
+                if (data.success && data.data.length > 0) {
+                    data.data.forEach(item => {
+                        const row = `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><span class="badge badge-info">${item.package_name || '-'}</span></td>
+                                <td>${item.customer_name || '-'}</td>
+                                <td>${item.email || '-'}</td>
+                                <td>${item.phone || '-'}</td>
+                                <td>${item.company || '-'}</td>
+                                <td>${item.message ? (item.message.length > 50 ? item.message.substring(0, 50) + '...' : item.message) : '-'}</td>
+                                <td>${new Date(item.created_at).toLocaleString('tr-TR')}</td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <p>Henüz paket seçimi bulunmuyor.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Paket yükleme hatası:', error);
+                document.getElementById('packagesLoading').innerHTML = '<p style="color: red;">Veri yükleme hatası!</p>';
+            }
+        }
+
+        // Load recommendations
+        async function loadRecommendations() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/recommendations`);
+                const data = await response.json();
+                
+                document.getElementById('recommendationsLoading').style.display = 'none';
+                document.getElementById('recommendationsContent').style.display = 'block';
+                
+                const tbody = document.getElementById('recommendationsBody');
+                tbody.innerHTML = '';
+                
+                if (data.success && data.data.length > 0) {
+                    data.data.forEach(item => {
+                        const row = `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.sector || '-'}</td>
+                                <td>${item.audience || '-'}</td>
+                                <td>${item.budget || '-'}</td>
+                                <td><span class="badge badge-success">${item.recommended_package || '-'}</span></td>
+                                <td><span class="badge badge-warning">${item.score || '-'}%</span></td>
+                                <td>${item.roi || '-'}</td>
+                                <td>${item.duration || '-'}</td>
+                                <td>${new Date(item.created_at).toLocaleString('tr-TR')}</td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="9" class="empty-state">
+                                <div class="empty-state-icon">🎯</div>
+                                <p>Henüz strateji önerisi bulunmuyor.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Strateji yükleme hatası:', error);
+                document.getElementById('recommendationsLoading').innerHTML = '<p style="color: red;">Veri yükleme hatası!</p>';
+            }
+        }
+
+        // Load contacts
+        async function loadContacts() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/contacts`);
+                const data = await response.json();
+                
+                document.getElementById('contactsLoading').style.display = 'none';
+                document.getElementById('contactsContent').style.display = 'block';
+                
+                const tbody = document.getElementById('contactsBody');
+                tbody.innerHTML = '';
+                
+                if (data.success && data.data.length > 0) {
+                    data.data.forEach(item => {
+                        const row = `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.name || '-'}</td>
+                                <td>${item.email || '-'}</td>
+                                <td>${item.phone || '-'}</td>
+                                <td>${item.company || '-'}</td>
+                                <td>${item.message ? (item.message.length > 50 ? item.message.substring(0, 50) + '...' : item.message) : '-'}</td>
+                                <td>${new Date(item.created_at).toLocaleString('tr-TR')}</td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-state-icon">📧</div>
+                                <p>Henüz iletişim formu bulunmuyor.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('İletişim yükleme hatası:', error);
+                document.getElementById('contactsLoading').innerHTML = '<p style="color: red;">Veri yükleme hatası!</p>';
+            }
+        }
+
+        // Load all data
+        function loadAllData() {
+            loadStats();
+            loadPackages();
+            loadRecommendations();
+            loadContacts();
+        }
+
+        // Filter table
+        function filterTable(tableId, searchValue) {
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            const filter = searchValue.toLowerCase();
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const text = row.textContent.toLowerCase();
+                
+                if (text.includes(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        // Export to CSV
+        function exportToCSV(type) {
+            let tableId, filename;
+            
+            switch(type) {
+                case 'packages':
+                    tableId = 'packagesTable';
+                    filename = 'paket_secimleri.csv';
+                    break;
+                case 'recommendations':
+                    tableId = 'recommendationsTable';
+                    filename = 'strateji_onerileri.csv';
+                    break;
+                case 'contacts':
+                    tableId = 'contactsTable';
+                    filename = 'iletisim_formlari.csv';
+                    break;
+            }
+
+            const table = document.getElementById(tableId);
+            let csv = [];
+            
+            // Get headers
+            const headers = [];
+            const headerCells = table.querySelectorAll('thead th');
+            headerCells.forEach(cell => headers.push(cell.textContent));
+            csv.push(headers.join(','));
+            
+            // Get data rows (only visible ones)
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const cols = [];
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        let text = cell.textContent.replace(/,/g, ';'); // Replace commas
+                        cols.push(`"${text}"`);
+                    });
+                    if (cols.length > 0) {
+                        csv.push(cols.join(','));
+                    }
+                }
+            });
+            
+            // Download
+            const csvContent = '\uFEFF' + csv.join('\n'); // Add BOM for Excel Turkish support
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                loadStats();
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
